@@ -1,10 +1,16 @@
 import Versions from './components/Versions'
 import icons from './assets/icons.svg'
+import Counter from './components/Counter'
+import NotesList from './components/NoteList'
 
 function App(): JSX.Element {
   return (
     <div className="container">
       <Versions></Versions>
+      <Counter></Counter>
+      
+      <h2 className="hero-text">Note list</h2>
+      <NotesList></NotesList>
 
       <svg className="hero-logo" viewBox="0 0 900 300">
         <use xlinkHref={`${icons}#electron`} />

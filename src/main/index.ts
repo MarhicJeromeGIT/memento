@@ -1,7 +1,9 @@
-import { app, shell, BrowserWindow } from 'electron'
+import { app, shell, BrowserWindow, ipcMain } from 'electron'
 import { join } from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import icon from '../../resources/icon.png?asset'
+const fs = require('fs');
+const path = require('path');
 
 function createWindow(): void {
   // Create the browser window.
@@ -33,6 +35,28 @@ function createWindow(): void {
   } else {
     mainWindow.loadFile(join(__dirname, '../renderer/index.html'))
   }
+
+  ipcMain.on('list-notes', (event) => {
+    console.log("listing existing notes")
+    const notesDir = path.join(app.getPath('home'), '.memento');
+
+    // Ensure the directory exists
+    if (!fs.existsSync(notesDir)) {
+        fs.mkdirSync(notesDir, { recursive: true });
+    }
+
+    // Read the directory for note files
+    fs.readdir(notesDir, (err, files) => {
+        if (err) {
+            console.error('Failed to read directory:', err);
+            event.reply('list-notes-response', []);
+        } else {
+            console.log('Found files:', files);
+            // Filter or process the files array as needed
+            event.reply('list-notes-response', files);
+        }
+    });
+});
 }
 
 // This method will be called when Electron has finished

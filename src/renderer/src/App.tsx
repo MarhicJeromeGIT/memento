@@ -2,6 +2,8 @@ import Versions from './components/Versions'
 import icons from './assets/icons.svg'
 import Counter from './components/Counter'
 import NotesList from './components/NoteList'
+import { Tldraw } from '@tldraw/tldraw'
+import '@tldraw/tldraw/tldraw.css'
 
 function App(): JSX.Element {
   return (
@@ -11,6 +13,10 @@ function App(): JSX.Element {
       
       <h2 className="hero-text">Note list</h2>
       <NotesList></NotesList>
+
+      <div style={{ width: '500px', height: '500px' }}>
+        <Tldraw />
+      </div>
 
       <svg className="hero-logo" viewBox="0 0 900 300">
         <use xlinkHref={`${icons}#electron`} />

@@ -1,9 +1,11 @@
-import { app, shell, BrowserWindow, ipcMain } from 'electron'
+import { app, shell, BrowserWindow, ipcMain, session } from 'electron'
 import { join } from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import icon from '../../resources/icon.png?asset'
 const fs = require('fs');
 const path = require('path');
+
+//app.disableHardwareAcceleration();
 
 function createWindow(): void {
   // Create the browser window.
@@ -56,7 +58,19 @@ function createWindow(): void {
             event.reply('list-notes-response', files);
         }
     });
-});
+  });
+
+  session.defaultSession.webRequest.onHeadersReceived((details, callback) => {
+    callback({
+      responseHeaders: {
+        ...details.responseHeaders,
+        'Content-Security-Policy': [
+          "*" // TODO: what a pain...
+         // "default-src '*' 'unsafe-inline'; script-src 'self' 'unsafe-inline'; img-src 'self' localhost:5173; connect-src 'self'; font-src https://unpkg.com/@tldraw/;"
+        ]
+      }
+    })
+  })
 }
 
 // This method will be called when Electron has finished

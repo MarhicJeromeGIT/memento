@@ -1,18 +1,29 @@
 import Versions from './components/Versions'
 import icons from './assets/icons.svg'
 import Counter from './components/Counter'
-import NotesList from './components/NoteList'
+import NotesList from './components/NotesList'
+import NoteContent from './components/NoteContent';
 import { Tldraw } from '@tldraw/tldraw'
 import '@tldraw/tldraw/tldraw.css'
+import React, { useState } from 'react';
 
 function App(): JSX.Element {
+  const [selectedNote, setSelectedNote] = useState(null);
+
+  const handleNoteSelect = (note) => {
+    setSelectedNote(note);
+  };
+
   return (
     <div className="container">
       <Versions></Versions>
       <Counter></Counter>
       
       <h2 className="hero-text">Note list</h2>
-      <NotesList></NotesList>
+      <div className="app-container">
+        <NotesList onNoteSelect={handleNoteSelect} />
+        <NoteContent selectedNote={selectedNote} />
+      </div>
 
       <div style={{ width: '500px', height: '500px' }}>
         <Tldraw />

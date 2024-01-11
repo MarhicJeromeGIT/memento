@@ -60,6 +60,21 @@ function createWindow(): void {
     });
   });
 
+  ipcMain.handle('read-note', async (event, note) => {
+    console.log("reading note")
+    console.log(note)
+    const notesDir = path.join(app.getPath('home'), '.memento', note);
+  
+    try {
+      const noteContent = await fs.promises.readFile(notesDir, 'utf-8');
+      console.log('Note file content:', noteContent);
+      return noteContent;
+    } catch (error) {
+      console.error('Error reading note file:', error);
+      throw error;
+    }
+  });
+
   session.defaultSession.webRequest.onHeadersReceived((details, callback) => {
     callback({
       responseHeaders: {

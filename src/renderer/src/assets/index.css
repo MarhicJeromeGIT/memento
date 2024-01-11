@@ -203,3 +203,19 @@ a:hover {
     width: 100%;
   }
 }
+
+/* styles.css */
+.app-container {
+  display: grid;
+  grid-template-columns: 1fr 2fr; /* Left and Right columns */
+  gap: 20px; /* Gap between columns */
+}
+
+.notes-list {
+  border-right: 1px solid #ccc; /* Separate left and right columns with a border */
+  padding-right: 20px;
+}
+
+.note-content {
+  padding-left: 20px;
+}

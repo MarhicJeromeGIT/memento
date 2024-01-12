@@ -25,9 +25,9 @@ function App(): JSX.Element {
         <NoteContent selectedNote={selectedNote} />
       </div>
 
-      <div style={{ width: '500px', height: '500px' }}>
+      {/*<div style={{ width: '500px', height: '500px' }}>
         <Tldraw />
-      </div>
+      </div>*/}
 
       <svg className="hero-logo" viewBox="0 0 900 300">
         <use xlinkHref={`${icons}#electron`} />

@@ -3,17 +3,24 @@ import React, { useEffect, useState } from 'react';
 import "trix/dist/trix.umd";
 import "trix/dist/trix.css";
 import { TrixEditor } from "react-trix";
+
 const ipcRenderer = window.electron.ipcRenderer;
 
 const NoteContent = ({ selectedNote }) => {
   const [noteContent, setNoteContent] = useState('');
+  const [editor, setEditor] = useState(null);
 
   useEffect(() => {
+    console.log("selected note changed")
     const fetchNoteContent = async () => {
       if (selectedNote) {
         try {
           const content = await ipcRenderer.invoke('read-note', selectedNote);
           setNoteContent(content);
+
+          if(editor) {
+            editor.loadJSON(JSON.parse(content))
+          }
         } catch (error) {
           console.error('Error reading note:', error);
           setNoteContent('Error loading note content');
@@ -23,6 +30,16 @@ const NoteContent = ({ selectedNote }) => {
 
     fetchNoteContent();
   }, [selectedNote]); // Run this effect when selectedNote changes
+
+  useEffect(() => {
+    console.log("trix editor changed")
+    console.log("setting content to")
+    console.log(noteContent)
+
+    if (editor && noteContent) {
+      editor.loadJSON(JSON.parse(noteContent))
+    }
+  }, [editor]); // Run this effect when editor changes
 
   let mergeTags = [{
     trigger: "@",
@@ -38,29 +55,20 @@ const NoteContent = ({ selectedNote }) => {
     ]
   }]
 
-  const handleEditorReady = (editor) => {
+  const handleEditorReady = (trix_editor) => {
     console.log("editor is ready")
-    editor.insertString("editor is ready");
+    trix_editor.insertString("editor is ready");
+
+    setEditor(trix_editor);
   };
 
   const handleChange = (html, text) => {
-    console.log("html", html);
-    console.log("text", text);
+    console.log(JSON.stringify(editor));
   };
 
   return (
     <div className="note-content">
       <h2>Note Content</h2>
-      {selectedNote ? (
-        <div>
-          <h3>{selectedNote}</h3>
-          <pre>{noteContent}</pre>
-        </div>
-      ) : (
-        <div>Select a note to view its content.</div>
-      )}
-      <h3>Editor</h3>
-      <p>Editor is ready</p>
       <div style={{width: 500, height: 500}}>
         <TrixEditor onChange={handleChange} onEditorReady={handleEditorReady} mergeTags={mergeTags}  />
       </div>

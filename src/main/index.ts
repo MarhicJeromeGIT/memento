@@ -38,32 +38,51 @@ function createWindow(): void {
     mainWindow.loadFile(join(__dirname, '../renderer/index.html'))
   }
 
-  ipcMain.on('list-notes', (event) => {
+  ipcMain.on('list-docs', async (event) => {
     console.log("listing existing notes")
-    const notesDir = path.join(app.getPath('home'), '.memento');
+    const notesDir = path.join(app.getPath('home'), '.memento', 'notes');
+    const canvasesDir = path.join(app.getPath('home'), '.memento', 'canvases');
 
     // Ensure the directory exists
     if (!fs.existsSync(notesDir)) {
         fs.mkdirSync(notesDir, { recursive: true });
     }
+    if (!fs.existsSync(canvasesDir)) {
+        fs.mkdirSync(canvasesDir, { recursive: true });
+    }
 
-    // Read the directory for note files
-    fs.readdir(notesDir, (err, files) => {
-        if (err) {
-            console.error('Failed to read directory:', err);
-            event.reply('list-notes-response', []);
-        } else {
-            console.log('Found files:', files);
-            // Filter or process the files array as needed
-            event.reply('list-notes-response', files);
+    // Function to read files from a directory
+    const readDir = (dir) => new Promise((resolve, reject) => {
+        if (!fs.existsSync(dir)) {
+            fs.mkdirSync(dir, { recursive: true });
         }
+
+        fs.readdir(dir, (err, files) => {
+            if (err) {
+                console.error(`Failed to read directory: ${dir}`, err);
+                reject(err);
+            } else {
+                resolve(files);
+            }
+        });
     });
+
+    try {
+      // Read both directories
+      const notesFiles = await readDir(notesDir);
+      const canvasesFiles = await readDir(canvasesDir);
+
+      // Combine and send the results
+      event.reply('list-docs-response', { notes: notesFiles, canvases: canvasesFiles });
+    } catch (err) {
+      event.reply('list-docs-response', { notes: [], canvases: [] });
+    }
   });
 
   ipcMain.handle('read-note', async (event, note) => {
     console.log("reading note")
     console.log(note)
-    const notesDir = path.join(app.getPath('home'), '.memento', note);
+    const notesDir = path.join(app.getPath('home'), '.memento', 'notes', note);
   
     try {
       const noteContent = await fs.promises.readFile(notesDir, 'utf-8');

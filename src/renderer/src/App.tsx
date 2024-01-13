@@ -8,7 +8,10 @@ import React, { useState } from 'react';
 import { Doc } from './interfaces/doc_interface';
 
 function App(): JSX.Element {
-  const [selectedDoc, setSelectedDoc] = useState<Doc | null>(null);
+  const [selectedDoc, setSelectedDoc] = useState<Doc | null>({
+    type: 'note',
+    filename: null
+  });
 
   const handleDocSelect = (doc) => {
     setSelectedDoc(doc);
@@ -16,18 +19,19 @@ function App(): JSX.Element {
 
   return (
     <div className="container">      
-      <h2 className="hero-text">Note list</h2>
       <div className="app-container">
-        <DocsList onDocSelect={handleDocSelect} />
-        {selectedDoc && selectedDoc.type === 'note' && (
-          <NoteContent selectedNote={selectedDoc.filename} />
-        )}
-        {selectedDoc && selectedDoc.type === 'canvas' && (
-          <CanvasContent filename={selectedDoc.filename} />
-        )}
+        <div className="doc-list">
+          <DocsList onDocSelect={handleDocSelect} />
+        </div>
+        <div className="doc-content">
+          {selectedDoc && selectedDoc.type === 'note' && (
+            <NoteContent filename={selectedDoc.filename} />
+          )}
+          {selectedDoc && selectedDoc.type === 'canvas' && (
+            <CanvasContent filename={selectedDoc.filename} />
+          )}
+        </div>
       </div>
-
-      <Versions></Versions>
     </div>
   )
 }

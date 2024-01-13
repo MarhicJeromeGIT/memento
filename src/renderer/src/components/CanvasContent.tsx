@@ -12,8 +12,11 @@ const CanvasContent = ({ filename }) => {
   }, [filename]); // Run this effect when selectedNote changes
 
   return (
-    <div style={{ width: '500px', height: '500px' }}>
-      <Tldraw />
+    <div className="canvas-content">
+      <h2>Canvas</h2>
+      <div className="canvas-content-tldraw">
+        <Tldraw />
+      </div>
     </div>
   );
 };

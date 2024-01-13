@@ -6,16 +6,16 @@ import { TrixEditor } from "react-trix";
 
 const ipcRenderer = window.electron.ipcRenderer;
 
-const NoteContent = ({ selectedNote }) => {
+const NoteContent = ({ filename }) => {
   const [noteContent, setNoteContent] = useState('');
   const [editor, setEditor] = useState(null);
 
   useEffect(() => {
     console.log("selected note changed")
     const fetchNoteContent = async () => {
-      if (selectedNote) {
+      if (filename) {
         try {
-          const content = await ipcRenderer.invoke('read-note', selectedNote);
+          const content = await ipcRenderer.invoke('read-note', filename);
           setNoteContent(content);
 
           if(editor) {
@@ -25,11 +25,19 @@ const NoteContent = ({ selectedNote }) => {
           console.error('Error reading note:', error);
           setNoteContent('Error loading note content');
         }
+      } else {
+        console.log("new note")
+        // This is a new note, so clear the content
+        setNoteContent('');
+
+        if(editor) {
+          editor.loadHTML("")
+        }
       }
     };
 
     fetchNoteContent();
-  }, [selectedNote]); // Run this effect when selectedNote changes
+  }, [filename]); // Run this effect when selectedNote changes
 
   useEffect(() => {
     console.log("trix editor changed")
@@ -57,8 +65,6 @@ const NoteContent = ({ selectedNote }) => {
 
   const handleEditorReady = (trix_editor) => {
     console.log("editor is ready")
-    trix_editor.insertString("editor is ready");
-
     setEditor(trix_editor);
   };
 
@@ -69,8 +75,8 @@ const NoteContent = ({ selectedNote }) => {
   return (
     <div className="note-content">
       <h2>Note Content</h2>
-      <div style={{width: 500, height: 500}}>
-        <TrixEditor onChange={handleChange} onEditorReady={handleEditorReady} mergeTags={mergeTags}  />
+      <div>
+        <TrixEditor onChange={handleChange} onEditorReady={handleEditorReady} mergeTags={mergeTags} placeholder="tododidou" />
       </div>
     </div>
   );

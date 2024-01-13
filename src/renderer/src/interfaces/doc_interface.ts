@@ -1,4 +1,4 @@
 export interface Doc {
   type: 'note' | 'canvas';
-  filename: string;
+  filename: string | null;
 }

@@ -1,8 +1,6 @@
 // NoteContent.js
 import React, { useEffect, useState } from 'react';
-import "trix/dist/trix.umd";
-import "trix/dist/trix.css";
-import { TrixEditor } from "react-trix";
+import TrixEditor from './TrixEditor';
 
 const ipcRenderer = window.electron.ipcRenderer;
 
@@ -76,7 +74,8 @@ const NoteContent = ({ filename }) => {
     <div className="note-content">
       <h2>Note Content</h2>
       <div>
-        <TrixEditor onChange={handleChange} onEditorReady={handleEditorReady} mergeTags={mergeTags} placeholder="tododidou" />
+         <TrixEditor onChange={handleChange} />
+        {/*<TrixEditor onChange={handleChange} onEditorReady={handleEditorReady} mergeTags={mergeTags}  />*/}
       </div>
     </div>
   );

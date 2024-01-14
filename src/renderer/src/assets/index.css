@@ -12,8 +12,8 @@ body {
     'Cantarell',
     'Open Sans',
     sans-serif;
-  color: #86a5b1;
-  background-color: #2f3241;
+  color: #000000;
+  background-color: #cacaca;
 }
 
 * {
@@ -39,7 +39,7 @@ body {
 
 .doc-list {
   width: 150px;
-  background-color: #f4f4f4;
+  background-color: #cacaca;
   overflow-y: auto;
   height: 100%;
 }

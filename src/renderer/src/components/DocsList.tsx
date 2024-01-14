@@ -1,11 +1,27 @@
 // NotesList.js
 import React, { useEffect, useState, useMemo } from 'react';
 import { Doc } from '../interfaces/doc_interface';
+import '../assets/docs-list.css';
 
 const ipcRenderer = window.electron.ipcRenderer;
 
 const DocsList = ({ onDocSelect }) => {
   const [docs, setDocs] = useState<Doc[]>([]);
+
+  const handleAddNote = () => {
+    // adds a new note to the docs list
+    // and sends a message to the main process to create a new file
+    // with the given filename
+    const newNote = { type: 'note', filename: 'new note' };
+    setDocs([...docs, newNote]);
+  };
+
+  const handleAddCanvas = () => {
+    // Implement the logic to add a new canvas
+    // Similar to handleAddNote
+    const newNote = { type: 'canvas', filename: 'new canvas' };
+    setDocs([...docs, newNote]);
+  };
 
   useEffect(() => {
     ipcRenderer.send('list-docs');
@@ -26,23 +42,29 @@ const DocsList = ({ onDocSelect }) => {
 
   return (
     <div className="docs-list">
-      <h2>Your Notes</h2>
-      <ul>
-        {notesList.map((note, index) => (
-          <li key={index} onClick={() => onDocSelect(note)}>
-            {note.filename}
-          </li>
-        ))}
-      </ul>
+      <div className="docs-list-section">
+        <h2>Notes</h2>
+        <button onClick={handleAddNote}>+ Add</button>
+        <ul>
+          {notesList.map((note, index) => (
+            <li key={index} onClick={() => onDocSelect(note)}>
+              {note.filename}
+            </li>
+          ))}
+        </ul>
+      </div>
 
-      <h2>Your Canvases</h2>
-      <ul>
-        {canvasesList.map((canvas, index) => (
-          <li key={index} onClick={() => onDocSelect(canvas)}>
-            {canvas.filename}
-          </li>
-        ))}
-      </ul>
+      <div className="docs-list-section">
+        <h2>Canvases</h2>
+        <button onClick={handleAddCanvas}>+ Add</button>
+        <ul>
+          {canvasesList.map((canvas, index) => (
+            <li key={index} onClick={() => onDocSelect(canvas)}>
+              {canvas.filename}
+            </li>
+          ))}
+        </ul>
+      </div>
     </div>
   );
 };

@@ -6,6 +6,16 @@ const fs = require('fs');
 const path = require('path');
 
 //app.disableHardwareAcceleration();
+const notesDir = path.join(app.getPath('home'), '.memento', 'notes');
+const canvasesDir = path.join(app.getPath('home'), '.memento', 'canvases');
+
+// Ensure the notes directory exists
+if (!fs.existsSync(notesDir)) {
+  console.log("creating notes directory at " + notesDir)
+  fs.mkdirSync(notesDir, { recursive: true });
+} else {
+  console.log("notes directory already exists at " + notesDir)
+}
 
 function createWindow(): void {
   // Create the browser window.
@@ -40,8 +50,6 @@ function createWindow(): void {
 
   ipcMain.on('list-docs', async (event) => {
     console.log("listing existing notes")
-    const notesDir = path.join(app.getPath('home'), '.memento', 'notes');
-    const canvasesDir = path.join(app.getPath('home'), '.memento', 'canvases');
 
     // Ensure the directory exists
     if (!fs.existsSync(notesDir)) {
@@ -91,6 +99,21 @@ function createWindow(): void {
     } catch (error) {
       console.error('Error reading note file:', error);
       throw error;
+    }
+  });
+
+
+  ipcMain.handle('save-note', async (event, filename, content) => {
+    console.log("Saving note", filename);
+    const filePath = path.join(notesDir, filename);
+
+    try {
+      await fs.promises.writeFile(filePath, content, 'utf-8');
+      console.log('Note saved successfully:', filePath);
+      return { success: true, message: "Note saved successfully" };
+    } catch (error) {
+      console.error('Error saving note:', error);
+      return { success: false, message: "Error saving note", error: error.message };
     }
   });
 

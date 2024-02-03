@@ -9,12 +9,12 @@ const TrixEditor = (props) => {
     const trixEditor = trixEditorRef.current;
     trixEditor.addEventListener('trix-change', (event) => {
       if (props.onChange) {
-        props.onChange(event.target.innerHTML);
+        props.onChange(event.target.innerHTML, event.target.innerText);
       }
     });
     trixEditor.addEventListener('trix-initialize', (event) => {
       if (props.onEditorReady) {
-        props.handleEditorReady(event.target.innerHTML);
+        props.onEditorReady(trixEditor);
       }
     });
   }, []);

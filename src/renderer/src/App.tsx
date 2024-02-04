@@ -1,39 +1,45 @@
-import Versions from './components/Versions'
-import icons from './assets/icons.svg'
-import Counter from './components/Counter'
-import DocsList from './components/DocsList'
+import React, { useState } from 'react';
+// Component imports
+import DocsList from './components/DocsList';
 import NoteContent from './components/NoteContent';
 import CanvasContent from './components/CanvasContent';
-import React, { useState } from 'react';
+
+// Asset imports
+import icons from './assets/icons.svg'; // Assuming you're using this somewhere not shown
 import { Doc } from './interfaces/doc_interface';
 
 function App(): JSX.Element {
-  const [selectedDoc, setSelectedDoc] = useState<Doc | null>({
-    type: 'note',
-    filename: null
-  });
+  const [selectedDoc, setSelectedDoc] = useState<Doc | null>(null);
 
-  const handleDocSelect = (doc) => {
+  const handleDocSelect = (doc: Doc) => {
     setSelectedDoc(doc);
   };
 
+  const renderDocContent = () => {
+    if (!selectedDoc) return null;
+
+    switch (selectedDoc.type) {
+      case 'note':
+        return selectedDoc.filename && <NoteContent filename={selectedDoc.filename} />;
+      case 'canvas':
+        return <CanvasContent filename={selectedDoc.filename} />;
+      default:
+        return null;
+    }
+  };
+
   return (
-    <div className="container">      
+    <div className="container">
       <div className="app-container">
         <div className="doc-list">
           <DocsList onDocSelect={handleDocSelect} />
         </div>
         <div className="doc-content">
-          {selectedDoc && selectedDoc.filename != null && selectedDoc.type === 'note' && (
-            <NoteContent filename={selectedDoc.filename} />
-          )}
-          {selectedDoc && selectedDoc.type === 'canvas' && (
-            <CanvasContent filename={selectedDoc.filename} />
-          )}
+          {renderDocContent()}
         </div>
       </div>
     </div>
-  )
+  );
 }
 
-export default App
+export default App;

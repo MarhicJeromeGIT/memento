@@ -7,22 +7,31 @@ const TrixEditor = (props) => {
 
   useEffect(() => {
     const trixEditor = trixEditorRef.current;
-    trixEditor.addEventListener('trix-change', (event) => {
+
+    const handleChange = (event) => {
       if (props.onChange) {
         props.onChange(event.target.innerHTML, event.target.innerText);
       }
-    });
-    trixEditor.addEventListener('trix-initialize', (event) => {
-      console.log("trix is initializerd, sending to parent")
+    };
+
+    const handleInitialize = (event) => {
       if (props.onEditorReady) {
-        console.log("props is set")
         props.onEditorReady(trixEditor);
       }
-    });
-  }, []);
+    };
+
+    trixEditor.addEventListener('trix-change', handleChange);
+    trixEditor.addEventListener('trix-initialize', handleInitialize);
+
+    // Cleanup function
+    return () => {
+      trixEditor.removeEventListener('trix-change', handleChange);
+      trixEditor.removeEventListener('trix-initialize', handleInitialize);
+    };
+  }, []); // Props aren't in dependency array; add them if props change dynamically
 
   return (
-    <trix-editor ref={trixEditorRef} input="trix-input" placeholder="tododidou"></trix-editor>
+    <trix-editor ref={trixEditorRef} input="trix-input" placeholder="Enter text here..."></trix-editor>
   );
 };
 

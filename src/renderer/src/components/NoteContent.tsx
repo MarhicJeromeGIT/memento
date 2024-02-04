@@ -1,25 +1,22 @@
-// NoteContent.js
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useRef } from 'react';
 import TrixEditor from './TrixEditor';
 import debounce from 'lodash/debounce';
-import { fetchAutocomplete } from '../services/TextGeneration'; // Adjust the path as necessary
-const ipcRenderer = window.electron.ipcRenderer;
+import { fetchAutocomplete } from '../services/TextGeneration';
+const { ipcRenderer } = window.electron;
 
 const NoteContent = ({ filename }) => {
-  const [noteContent, setNoteContent] = useState('');
   const editorRef = useRef(null);
 
   const saveNote = async () => {
-    console.log("attempting to save to ", filename)
     if (!filename) {
       console.error("No filename specified for saving.");
       return;
     }
-  
+
     try {
-      const content = JSON.stringify(editorRef.current.editor);
-      console.log("saving content : ")
-      console.log(content)
+      // Assuming the Trix editor's content is directly accessible as innerHTML
+      // Adjust this based on how you can best extract content from Trix in your setup
+      const content = editorRef.current ? editorRef.current.innerHTML : '';
       await ipcRenderer.invoke('save-note', filename, content);
       console.log("Note saved successfully!");
     } catch (error) {
@@ -28,86 +25,52 @@ const NoteContent = ({ filename }) => {
   };
 
   useEffect(() => {
-    console.log("selected note changed to ", filename)
     const fetchNoteContent = async () => {
       if (filename) {
         try {
           const content = await ipcRenderer.invoke('read-note', filename);
-          setNoteContent(content);
-
-          console.log("setting content to")
-          console.log(content)
-          if(editorRef) {
+          // Directly setting the editor's content through innerHTML
+          // This may need adjustment based on your specific requirements and Trix's capabilities
+          if (editorRef.current) {
             editorRef.current.editor.loadJSON(JSON.parse(content))
           }
         } catch (error) {
           console.error('Error reading note:', error);
-          setNoteContent('Error loading note content');
         }
-      } else {
-        console.log("new note")
-        // This is a new note, so clear the content
-        setNoteContent('');
-
-        // if(editor) {
-        //   editor.loadHTML("")
-        // }
       }
     };
 
     fetchNoteContent();
-  }, [filename]); // Run this effect when selectedNote changes
+  }, [filename]);
 
-  // useEffect(() => {
-  //   console.log("trix editor changed")
-  //   console.log("setting content to")
-  //   console.log(noteContent)
-
-  //   if (editor && noteContent) {
-  //     editor.loadJSON(JSON.parse(noteContent))
-  //   }
-  // }, [editor]); // Run this effect when editor changes
-
-  const handleEditorReady = (trix_editor) => {
-    editorRef.current = trix_editor; // Store the editor instance in the ref
-    console.log('Editor is ready:', editorRef.current);
+  const handleEditorReady = (trixEditor) => {
+    // This callback now correctly captures the editor reference
+    // Ensure this matches how you plan to use the editor's API
+    editorRef.current = trixEditor;
   };
 
-  const insertAutocompleteSuggestion = (suggestion) => {
-    console.log("inserting suggestion")
-    console.log(editorRef.current)
-    if (!editorRef.current) return;
-    
-    const editorElement = editorRef.current.editor;
-    console.log("autocomplete on", editorElement)
-    editorElement.insertString(suggestion);
-  };
-
-  const handleChangeDebounced = debounce(async (text) => {
+  const insertAutocompleteSuggestion = debounce(async (text) => {
     try {
       const data = await fetchAutocomplete(text);
-      let completion = data['response']
-      console.log(completion);
-      // Process and use the data as needed
-
-      insertAutocompleteSuggestion(completion)
+      if (editorRef.current && data.response) {
+        // Inserting suggestion directly to the Trix editor
+        // Adjust based on Trix's API for inserting text
+        editorRef.current.editor.insertString(data.response);
+      }
     } catch (error) {
       console.error('Error fetching autocomplete:', error);
     }
-  }, 300); // Adjust debounce time as necessary
+  }, 300);
 
-  const handleChange = (_html: string, text: string) => {
-    // console.log("text changed to text ", text);
-    // handleChangeDebounced(text);
+  const handleChange = (_html, text) => {
+    //insertAutocompleteSuggestion(text);
   };
 
   return (
     <div className="note-content">
       <h2>Note Content</h2>
-      <button onClick={saveNote} className="save-button">SAVE</button>
-      <div>
-         <TrixEditor onChange={handleChange} onEditorReady={handleEditorReady} />
-      </div>
+      <button onClick={saveNote} className="save-button">Save</button>
+      <TrixEditor onChange={handleChange} onEditorReady={handleEditorReady} />
     </div>
   );
 };

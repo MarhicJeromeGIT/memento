@@ -12,14 +12,14 @@ const DocsList = ({ onDocSelect }) => {
     // adds a new note to the docs list
     // and sends a message to the main process to create a new file
     // with the given filename
-    const newNote = { type: 'note', filename: 'new note' };
+    const newNote = { type: 'note', filename: 'new_note.json' };
     setDocs([...docs, newNote]);
   };
 
   const handleAddCanvas = () => {
     // Implement the logic to add a new canvas
     // Similar to handleAddNote
-    const newNote = { type: 'canvas', filename: 'new canvas' };
+    const newNote = { type: 'canvas', filename: 'new_canvas.json' };
     setDocs([...docs, newNote]);
   };
 

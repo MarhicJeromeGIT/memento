@@ -8,7 +8,6 @@ const ipcRenderer = window.electron.ipcRenderer;
 const NoteContent = ({ filename }) => {
   const [noteContent, setNoteContent] = useState('');
   const editorRef = useRef(null);
-  const [editor, setEditor] = useState(null);
 
   const saveNote = async () => {
     console.log("attempting to save to ", filename)
@@ -18,7 +17,7 @@ const NoteContent = ({ filename }) => {
     }
   
     try {
-      const content = JSON.stringify(editorRef.current.editor.getDocument()); // Assuming you want to save in JSON format
+      const content = JSON.stringify(editorRef.current.editor);
       console.log("saving content : ")
       console.log(content)
       await ipcRenderer.invoke('save-note', filename, content);
@@ -29,15 +28,17 @@ const NoteContent = ({ filename }) => {
   };
 
   useEffect(() => {
-    console.log("selected note changed")
+    console.log("selected note changed to ", filename)
     const fetchNoteContent = async () => {
       if (filename) {
         try {
           const content = await ipcRenderer.invoke('read-note', filename);
           setNoteContent(content);
 
-          if(editor) {
-            editor.loadJSON(JSON.parse(content))
+          console.log("setting content to")
+          console.log(content)
+          if(editorRef) {
+            editorRef.current.editor.loadJSON(JSON.parse(content))
           }
         } catch (error) {
           console.error('Error reading note:', error);
@@ -48,24 +49,24 @@ const NoteContent = ({ filename }) => {
         // This is a new note, so clear the content
         setNoteContent('');
 
-        if(editor) {
-          editor.loadHTML("")
-        }
+        // if(editor) {
+        //   editor.loadHTML("")
+        // }
       }
     };
 
     fetchNoteContent();
   }, [filename]); // Run this effect when selectedNote changes
 
-  useEffect(() => {
-    console.log("trix editor changed")
-    console.log("setting content to")
-    console.log(noteContent)
+  // useEffect(() => {
+  //   console.log("trix editor changed")
+  //   console.log("setting content to")
+  //   console.log(noteContent)
 
-    if (editor && noteContent) {
-      editor.loadJSON(JSON.parse(noteContent))
-    }
-  }, [editor]); // Run this effect when editor changes
+  //   if (editor && noteContent) {
+  //     editor.loadJSON(JSON.parse(noteContent))
+  //   }
+  // }, [editor]); // Run this effect when editor changes
 
   const handleEditorReady = (trix_editor) => {
     editorRef.current = trix_editor; // Store the editor instance in the ref

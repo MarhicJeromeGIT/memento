@@ -24,7 +24,7 @@ function App(): JSX.Element {
           <DocsList onDocSelect={handleDocSelect} />
         </div>
         <div className="doc-content">
-          {selectedDoc && selectedDoc.type === 'note' && (
+          {selectedDoc && selectedDoc.filename != null && selectedDoc.type === 'note' && (
             <NoteContent filename={selectedDoc.filename} />
           )}
           {selectedDoc && selectedDoc.type === 'canvas' && (

@@ -13,7 +13,9 @@ const TrixEditor = (props) => {
       }
     });
     trixEditor.addEventListener('trix-initialize', (event) => {
+      console.log("trix is initializerd, sending to parent")
       if (props.onEditorReady) {
+        console.log("props is set")
         props.onEditorReady(trixEditor);
       }
     });

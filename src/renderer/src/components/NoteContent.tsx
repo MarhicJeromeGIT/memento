@@ -1,11 +1,14 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import TrixEditor from './TrixEditor';
 import debounce from 'lodash/debounce';
 import { fetchAutocomplete } from '../services/TextGeneration';
 const { ipcRenderer } = window.electron;
 
+import '../assets/docs-list.css';
+
 const NoteContent = ({ filename }) => {
   const editorRef = useRef(null);
+  const [suggestion, setSuggestion] = useState('');
 
   const saveNote = async () => {
     if (!filename) {
@@ -49,28 +52,55 @@ const NoteContent = ({ filename }) => {
     editorRef.current = trixEditor;
   };
 
-  const insertAutocompleteSuggestion = debounce(async (text) => {
+  // Function to fetch autocomplete suggestion
+  const fetchSuggestion = async (text) => {
     try {
       const data = await fetchAutocomplete(text);
-      if (editorRef.current && data.response) {
-        // Inserting suggestion directly to the Trix editor
-        // Adjust based on Trix's API for inserting text
-        editorRef.current.editor.insertString(data.response);
-      }
+      console.log('Autocomplete response:', data.response);
+      setSuggestion(data.response); // Set the suggestion in state
     } catch (error) {
       console.error('Error fetching autocomplete:', error);
     }
+  };
+
+  // Debounced fetch suggestion
+  const handleChange = debounce((text) => {
+    fetchSuggestion(text);
   }, 300);
 
-  const handleChange = (_html, text) => {
-    //insertAutocompleteSuggestion(text);
-  };
+  // Effect for handling the Tab key to insert the suggestion
+  useEffect(() => {
+    const handleKeyDown = (event) => {
+      if (event.key === 'Tab' && suggestion && editorRef.current) {
+        event.preventDefault(); // Prevent default tab behavior
+        console.log('Inserting suggestion:', suggestion);
+        editorRef.current.editor.insertString(suggestion);
+        setSuggestion(''); // Clear the suggestion
+      }
+    };
+
+    if (editorRef.current) {
+      editorRef.current.addEventListener('keydown', handleKeyDown);
+    }
+
+    return () => {
+      if (editorRef.current) {
+        editorRef.current.removeEventListener('keydown', handleKeyDown);
+      }
+    };
+  }, [suggestion]);
 
   return (
     <div className="note-content">
       <h2>Note Content ({filename})</h2>
       <button onClick={saveNote} className="save-button">Save</button>
       <TrixEditor onChange={handleChange} onEditorReady={handleEditorReady} />
+      {/* Render the suggestion in the editor */}
+      {suggestion && (
+        <div className="autocomplete-suggestion">
+          {suggestion}
+        </div>
+      )}
     </div>
   );
 };

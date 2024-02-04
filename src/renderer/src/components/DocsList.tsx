@@ -2,7 +2,6 @@ import React, { useEffect, useState } from 'react';
 import { Doc } from '../interfaces/doc_interface';
 import '../assets/docs-list.css';
 
-// Assuming `window.electron` is correctly set up elsewhere
 const { ipcRenderer } = window.electron;
 
 interface DocsListProps {
@@ -11,6 +10,8 @@ interface DocsListProps {
 
 const DocsList: React.FC<DocsListProps> = ({ onDocSelect }) => {
   const [docs, setDocs] = useState<Doc[]>([]);
+  const [renamingDoc, setRenamingDoc] = useState<Doc | null>(null);
+  const [newName, setNewName] = useState('');
 
   useEffect(() => {
     ipcRenderer.send('list-docs');
@@ -34,14 +35,44 @@ const DocsList: React.FC<DocsListProps> = ({ onDocSelect }) => {
     setDocs((prevDocs) => [...prevDocs, newDoc]);
   };
 
-  const renderDocsList = (docType: 'note' | 'canvas') => {
-    return docs
-      .filter((doc) => doc.type === docType)
-      .map((doc, index) => (
-        <li key={index} onClick={() => onDocSelect(doc)}>
-          {doc.filename}
-        </li>
-      ));
+  const startRenaming = (doc: Doc) => {
+    setRenamingDoc(doc);
+    setNewName(doc.filename || '');
+  };
+
+  const cancelRenaming = () => {
+    setRenamingDoc(null);
+    setNewName('');
+  };
+
+  const commitRename = () => {
+    if (renamingDoc && newName.trim() !== '') {
+      ipcRenderer.invoke('rename-doc', renamingDoc.type, renamingDoc.filename, newName.trim())
+        .then(() => {
+          setDocs(docs.map(doc => doc.filename === renamingDoc.filename ? { ...doc, filename: newName.trim() } : doc));
+          cancelRenaming();
+        })
+        .catch(console.error);
+    }
+  };
+
+  const renderDocItem = (doc: Doc) => {
+    return (
+      <li key={doc.filename}>
+        {renamingDoc && renamingDoc.filename === doc.filename ? (
+          <div>
+            <input type="text" value={newName} onChange={(e) => setNewName(e.target.value)} />
+            <button onClick={commitRename}>Save</button>
+            <button onClick={cancelRenaming}>Cancel</button>
+          </div>
+        ) : (
+          <div onClick={() => onDocSelect(doc)}>
+            {doc.filename}
+            <button onClick={() => startRenaming(doc)}>Rename</button>
+          </div>
+        )}
+      </li>
+    );
   };
 
   return (
@@ -49,13 +80,12 @@ const DocsList: React.FC<DocsListProps> = ({ onDocSelect }) => {
       <div className="docs-list-section">
         <h2>Notes</h2>
         <button onClick={() => addDoc('note')}>+ Add Note</button>
-        <ul>{renderDocsList('note')}</ul>
+        <ul>{docs.filter(doc => doc.type === 'note').map(renderDocItem)}</ul>
       </div>
-
       <div className="docs-list-section">
         <h2>Canvases</h2>
         <button onClick={() => addDoc('canvas')}>+ Add Canvas</button>
-        <ul>{renderDocsList('canvas')}</ul>
+        <ul>{docs.filter(doc => doc.type === 'canvas').map(renderDocItem)}</ul>
       </div>
     </div>
   );

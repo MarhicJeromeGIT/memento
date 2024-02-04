@@ -102,7 +102,6 @@ function createWindow(): void {
     }
   });
 
-
   ipcMain.handle('save-note', async (event, filename, content) => {
     console.log("Saving note", filename);
     const filePath = path.join(notesDir, filename);
@@ -116,6 +115,33 @@ function createWindow(): void {
       return { success: false, message: "Error saving note", error: error.message };
     }
   });
+
+  ipcMain.handle('rename-doc', async (event, docType, oldFilename, newFilename) => {
+    try {
+      // Determine the correct directory based on the document type
+      const dirPath = docType === 'note' ? notesDir : canvasesDir;
+  
+      // Construct full paths for the old and new filenames
+      const oldFilePath = path.join(dirPath, oldFilename);
+      const newFilePath = path.join(dirPath, newFilename);
+  
+      // Check if the new file already exists
+      const fileExists = await fs.promises.access(newFilePath).then(() => true).catch(() => false);
+      
+      if (fileExists) {
+        throw new Error('A document with the new name already exists.');
+      }
+  
+      // Rename the file
+      await fs.promises.rename(oldFilePath, newFilePath);
+      
+      // Respond back that the file was successfully renamed
+      return { success: true, message: 'Document renamed successfully.' };
+    } catch (error) {
+      // Respond back with an error if the operation fails
+      return { success: false, message: error.message || 'An error occurred during the rename operation.' };
+    }
+  });  
 
   session.defaultSession.webRequest.onHeadersReceived((details, callback) => {
     callback({

@@ -1,7 +1,6 @@
 .docs-list {
   display: flex;
   flex-direction: column;
-  align-items: stretch; /* This ensures that child elements stretch to fill the container */
   padding: 10px;
 }
 
@@ -11,42 +10,46 @@
   margin-bottom: 20px;
   padding: 15px;
   box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-  display: flex;
-  flex-direction: column;
-}
-
-.docs-list-section:nth-child(odd) {
-  background-color: #f9f9f9;
-}
-
-.docs-list-section:nth-child(even) {
-  background-color: #f1f1f1;
+  background-color: white;
 }
 
 .docs-list h2 {
-  margin: 10px 0;
-  font-size: 20px; /* Adjust the size as needed */
-  font-weight: normal; /* Or you could use a number like 400 or 500 */
+  font-size: 1.25rem;
+  color: #333;
+  margin-bottom: 10px;
 }
 
+/* Style for add buttons and icon buttons */
 .docs-list button {
-  background-color: #4CAF50; /* Green background */
-  color: white; /* White text */
-  padding: 10px 15px;
-  margin: 5px;
+  background-color: #4CAF50;
+  color: white;
+  padding: 5px;
   border: none;
   border-radius: 5px;
   cursor: pointer;
   transition: background-color 0.3s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.docs-list button.icon-button {
+  background-color: transparent; /* no background for icon-only buttons */
+  color: #4CAF50; /* green icons to match the theme */
+  padding: 0; /* no padding for icon buttons */
+  width: 24px; /* size for icons */
+  height: 24px; /* size for icons */
+  margin-left: 5px; /* spacing from text or other elements */
 }
 
 .docs-list button:hover {
-  background-color: #45a049; /* Darker green */
+  background-color: #45a049;
 }
 
 .docs-list ul {
   list-style-type: none;
   padding: 0;
+  margin: 0; /* Remove margin to align with the header */
 }
 
 .docs-list li {
@@ -54,14 +57,27 @@
   margin: 5px 0;
   background-color: #f2f2f2;
   border-radius: 4px;
-  cursor: pointer;
   transition: background-color 0.3s ease;
-  display: -webkit-box;
-  -webkit-line-clamp: 2; /* Number of lines you want to display */
-  -webkit-box-orient: vertical;
-  overflow: hidden;
+  display: flex;
+  align-items: center; /* Align items in the list horizontally */
+  justify-content: space-between; /* Spread items from left to right */
 }
 
 .docs-list li:hover {
   background-color: #ddd;
+}
+
+/* Adjust this class for input fields */
+.docs-list input[type="text"] {
+  flex-grow: 1; /* take available space */
+  margin: 0 8px; /* spacing around the input field */
+  padding: 4px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+/* Remove default input field styling */
+.docs-list input[type="text"]:focus {
+  outline: none;
+  border-color: #4CAF50;
 }

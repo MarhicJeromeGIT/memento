@@ -16,7 +16,7 @@ const NoteContent = ({ filename }) => {
     try {
       // Assuming the Trix editor's content is directly accessible as innerHTML
       // Adjust this based on how you can best extract content from Trix in your setup
-      const content = editorRef.current ? editorRef.current.innerHTML : '';
+      const content = editorRef.current ? JSON.stringify(editorRef.current.editor) : '';
       await ipcRenderer.invoke('save-note', filename, content);
       console.log("Note saved successfully!");
     } catch (error) {
@@ -68,7 +68,7 @@ const NoteContent = ({ filename }) => {
 
   return (
     <div className="note-content">
-      <h2>Note Content</h2>
+      <h2>Note Content ({filename})</h2>
       <button onClick={saveNote} className="save-button">Save</button>
       <TrixEditor onChange={handleChange} onEditorReady={handleEditorReady} />
     </div>

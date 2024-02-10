@@ -7,13 +7,13 @@ const fetchAutocomplete = async (text) => {
       'Content-Type': 'application/json',
     },
     body: JSON.stringify({
-      model: "mistral",
-      prompt: `Complete the given sentence: ${text}`,
+      model: "mistral:text",
+      prompt: `${text}`,
       stream: false,
       options: {
         temperature: 0.1,
-        num_predict: 30,
-        stop: ["\n", "#", "「"],
+        num_predict: 50,
+        stop: [],
       },
     }),
   });

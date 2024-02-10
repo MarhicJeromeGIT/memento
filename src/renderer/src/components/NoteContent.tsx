@@ -64,7 +64,7 @@ const NoteContent = ({ filename }) => {
   };
 
   // Debounced fetch suggestion
-  const handleChange = debounce((text) => {
+  const handleChange = debounce((html, text) => {
     fetchSuggestion(text);
   }, 300);
 

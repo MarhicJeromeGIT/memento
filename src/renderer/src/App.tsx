@@ -30,13 +30,11 @@ function App(): JSX.Element {
 
   return (
     <div className="container">
-      <div className="app-container">
-        <div className="doc-list">
-          <DocsList onDocSelect={handleDocSelect} />
-        </div>
-        <div className="doc-content">
-          {renderDocContent()}
-        </div>
+      <div className="doc-list">
+        <DocsList onDocSelect={handleDocSelect} />
+      </div>
+      <div className="doc-content">
+        {renderDocContent()}
       </div>
     </div>
   );

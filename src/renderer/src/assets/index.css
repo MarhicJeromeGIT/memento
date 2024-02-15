@@ -33,12 +33,16 @@ body {
   flex: 0 1 auto; /* Does not grow, can shrink, and basis is content size */
   padding: 10px; /* Adds padding inside the column */
   border: 1px solid #ccc; /* Optional: Adds a border around the column */
+  overflow-y: scroll;
+  height: 100vh;
 }
 
 .doc-content {
   flex: 1; /* Grows to take up the remaining space */
   padding: 10px; /* Adds padding inside the column */
   border: 1px solid #ccc; /* Optional: Adds a border around the column */
+  overflow-y: auto;
+  height: 100vh;
 }
 
 .canvas-content {

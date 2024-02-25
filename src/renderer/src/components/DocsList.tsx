@@ -1,6 +1,17 @@
 import React, { useEffect, useState } from 'react';
 import { Doc } from '../interfaces/doc_interface';
 import '../assets/docs-list.css';
+import Box from '@mui/material/Box';
+import List from '@mui/material/List';
+import Divider from '@mui/material/Divider';
+import ListSubheader from '@mui/material/ListSubheader';
+import ListItem from '@mui/material/ListItem';
+import ListItemButton from '@mui/material/ListItemButton';
+import ListItemIcon from '@mui/material/ListItemIcon';
+import ListItemText from '@mui/material/ListItemText';
+import InboxIcon from '@mui/icons-material/MoveToInbox';
+import MailIcon from '@mui/icons-material/Mail';
+import Paper from '@mui/material/Paper';
 
 const { ipcRenderer } = window.electron;
 
@@ -76,18 +87,39 @@ const DocsList: React.FC<DocsListProps> = ({ onDocSelect }) => {
   };
 
   return (
-    <div className="docs-list">
-      <div className="docs-list-section">
-        <h2>Notes</h2>
-        <button onClick={() => addDoc('note')}>+ Add Note</button>
-        <ul>{docs.filter(doc => doc.type === 'note').map(renderDocItem)}</ul>
-      </div>
-      <div className="docs-list-section">
-        <h2>Canvases</h2>
-        <button onClick={() => addDoc('canvas')}>+ Add Canvas</button>
-        <ul>{docs.filter(doc => doc.type === 'canvas').map(renderDocItem)}</ul>
-      </div>
-    </div>
+    <Box className="docs-list">
+      <List dense={true}>
+      <ListItemButton onClick={() => addDoc('note')}>
+          <ListItemIcon>
+            <MailIcon />
+          </ListItemIcon>
+          <ListItemText primary="+ Add Note" />
+        </ListItemButton>
+        <Divider />
+        <ListItemButton onClick={() => addDoc('canvas')}>
+          <ListItemIcon>
+            <MailIcon />
+          </ListItemIcon>
+          <ListItemText primary="+ Add Canvas" />
+        </ListItemButton>
+        <Divider />
+        <ListSubheader>Notes</ListSubheader>
+
+        {docs.filter(doc => doc.type === 'note').map((doc, index) => (
+          <ListItem key={index} onClick={() => onDocSelect(doc)}>
+            <ListItemText primary={doc.filename} secondary={'1 Jan 2024'} />
+          </ListItem>
+        ))}
+
+      <ListSubheader>Canvases</ListSubheader>
+
+        {docs.filter(doc => doc.type === 'canvas').map((doc, index) => (
+          <ListItem key={index} onClick={() => onDocSelect(doc)}>
+            <ListItemText primary={doc.filename} secondary={'???'} />
+          </ListItem>
+        ))}
+      </List>      
+    </Box>
   );
 };
 

@@ -3,9 +3,13 @@ import React, { useState } from 'react';
 import DocsList from './components/DocsList';
 import NoteContent from './components/NoteContent';
 import CanvasContent from './components/CanvasContent';
+import Box from '@mui/material/Box';
+import Toolbar from '@mui/material/Toolbar';
+import Tabs from '@mui/material/Tabs';
+import Tab from '@mui/material/Tab';
+import AppBar from '@mui/material/AppBar';
 
 // Asset imports
-import icons from './assets/icons.svg'; // Assuming you're using this somewhere not shown
 import { Doc } from './interfaces/doc_interface';
 
 function App(): JSX.Element {
@@ -29,14 +33,14 @@ function App(): JSX.Element {
   };
 
   return (
-    <div className="container">
+    <Box className="container">
       <div className="doc-list">
         <DocsList onDocSelect={handleDocSelect} />
       </div>
       <div className="doc-content">
         {renderDocContent()}
       </div>
-    </div>
+    </Box>
   );
 }
 
